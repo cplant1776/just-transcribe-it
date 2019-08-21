@@ -1,0 +1,32 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title>Log In</title>
+</head>
+
+<body>
+    <form login-page='/customLogin?login_error=1' class="filter text-center" action="/login" method='POST'>
+        <div class="form-label-group">
+            <label for="inputUser">Username</label>
+            <input type="text" name="username" id="inputUser" class="form-control" placeholder="Username" required
+                autofocus>
+        </div>
+
+        <div class="form-label-group">
+            <label for="inputPassword">Password</label>
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password"
+                required>
+        </div>
+
+        <div th:if="${error != null}">
+            <p class="text-danger text-center my-error-text">
+                Invalid credentials. Please try again.
+            </p>
+        </div>
+
+        <button class="site-btn login-btn" name="submit" value="submit" type="submit">Sign in</button>
+    </form>
+</body>
+
+</html>

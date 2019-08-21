@@ -4,30 +4,23 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "user")
-public class User {
-
+public class AudioFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "user_id")
+    private Integer userId;
 
-    @Column(name = "password")
-    private String password;
+    @Column(name = "filename")
+    private String filename;
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "create_time")
     private Date createTime;
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public User() {
+    public AudioFile() {
 
     }
 
@@ -39,20 +32,20 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public String getPassword() {
-        return password;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public Date getCreateTime() {
