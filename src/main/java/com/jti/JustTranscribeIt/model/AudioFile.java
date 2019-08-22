@@ -1,5 +1,7 @@
 package com.jti.JustTranscribeIt.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -13,12 +15,18 @@ public class AudioFile {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "filename")
-    private String filename;
+    @Column(name = "fileUrl")
+    private String fileUrl;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
     private Date createTime;
+
+    public AudioFile(Integer userId, String fileUrl) {
+        this.userId = userId;
+        this.fileUrl = fileUrl;
+    }
 
     public AudioFile() {
 
@@ -40,12 +48,12 @@ public class AudioFile {
         this.userId = userId;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getFileUrl() {
+        return fileUrl;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 
     public Date getCreateTime() {

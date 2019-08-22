@@ -1,0 +1,47 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title>Sign Up</title>
+</head>
+
+<body>
+
+    <!-- Login Form -->
+
+    <form class="form-signin" action="#" method='POST'>
+        <label for="inputUser">Username</label>
+        <div class="form-label-group">
+            <input type="text" name="username" id="inputUser" class="form-control" placeholder="Username" required
+                autofocus>
+        </div>
+
+        <label for="inputPassword">Password</label>
+        <div class="form-label-group">
+            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password"
+                required>
+        </div>
+
+        <div class="form-label-group">
+            <label for="inputConfirmPassword">Confirm Password</label>
+
+            <input type="password" name="confirmPassword" id="inputConfirmPassword" class="form-control"
+                placeholder="Confirm Password" required>
+        </div>
+
+
+        <div th:if="${error != null}">
+            <p class="my-error-text text-center" th:text="${error}">
+
+            </p>
+        </div>
+
+        <div class="sign-up-btn">
+            <button class="site-btn" name="submit" value="submit" type="submit">Sign
+                up</button>
+        </div>
+    </form>
+
+</body>
+
+</html>
