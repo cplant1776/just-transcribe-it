@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <div th:replace="fragments/boilerplate :: css"></div>
+</head>
+
+<body>
+
+    <h2>Transcribe a file</h2>
+    <form enctype="multipart/form-data" action="/transcribe/new" name="transcribeForm" id="transcribeForm" method="POST">
+        <input type="text" placeholder="url" name="fileUrl">
+
+        <input type="submit" value="submit" id="transcribeBtn">
+    </form>
+
+    <div th:replace="fragments/boilerplate :: js"></div>
+    <script type="text/javascript" th:src="@{~/js/transcribe.js}"></script>
+
+</body>
+
+</html>

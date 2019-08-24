@@ -12,6 +12,7 @@ import com.jti.JustTranscribeIt.service.AmazonClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-@org.springframework.web.bind.annotation.RestController
+@Controller
 @RequestMapping("/storage")
 public class BucketController {
 

@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Table(name = "transcript")
 public class Transcript {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -18,10 +19,19 @@ public class Transcript {
     @Column(name = "transcript")
     private String transcript;
 
+    @Column(name = "job_name")
+    private String jobName;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
     private Date createTime;
+
+    public Transcript(Integer fileId, String transcript, String jobName) {
+        this.fileId = fileId;
+        this.transcript = transcript;
+        this.jobName = jobName;
+    }
 
     public Transcript() {
 
@@ -57,5 +67,13 @@ public class Transcript {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 }

@@ -11,20 +11,35 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.transcribe.AmazonTranscribe;
+import com.amazonaws.services.transcribe.AmazonTranscribeClient;
+import com.amazonaws.services.transcribe.AmazonTranscribeClientBuilder;
+import com.amazonaws.services.transcribe.model.*;
+import com.jti.JustTranscribeIt.dao.AudioFileDao;
+import com.jti.JustTranscribeIt.dao.TranscriptDao;
+import com.jti.JustTranscribeIt.dao.TranscriptExplicitDao;
+import com.jti.JustTranscribeIt.model.AudioFile;
+import com.jti.JustTranscribeIt.model.Transcript;
+import com.jti.JustTranscribeIt.model.TranscriptExplicit;
+import org.apache.tomcat.util.json.JSONParser;
+import org.aspectj.weaver.ast.Call;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.http.HttpRequest;
 import java.util.Date;
 
 @Service
 public class AmazonClientService {
-
-    private AmazonS3 s3client;
 
     @Value("${amazonProperties.endpointUrl}")
     private String endpointUrl;
@@ -35,6 +50,16 @@ public class AmazonClientService {
     @Value("${amazonProperties.secretKey}")
     private String secretKey;
 
+    private AmazonS3 s3client;
+
+    private AmazonTranscribe transcribeClient;
+
+    @Autowired
+    private AudioFileDao audioFileDao;
+
+    @Autowired
+    private AmazonTranscriptService amazonTranscriptService;
+
     @PostConstruct
     private void initializeAmazon() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
@@ -42,23 +67,73 @@ public class AmazonClientService {
                 .withRegion("us-east-1")
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
                 .build();
+        this.transcribeClient = AmazonTranscribeClientBuilder.standard().
+                withRegion("us-east-1")
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .build();
     }
+
+    /*================================
+           BUCKET FUNCTIONS
+     =================================*/
 
     private void uploadFileTos3bucket(String fileName, File file) {
         s3client.putObject(new PutObjectRequest(bucketName, fileName, file));
     }
 
-    private File convertMultiPartToFile(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
-        FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(file.getBytes());
-        fos.close();
-        return convFile;
+    public Boolean deleteFileFromS3Bucket(String fileUrl) {
+        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        try {
+            DeleteObjectsRequest delObjReq = new DeleteObjectsRequest(bucketName)
+                    .withKeys(fileName);
+            s3client.deleteObjects(delObjReq);
+            System.out.println("Deleted " + fileUrl + " from bucket.");
+        } catch (SdkClientException e) {
+            return false;
+        }
+        s3client.deleteObject(new DeleteObjectRequest(bucketName + "/", fileName));
+        return true;
     }
 
-    private String generateFileName(MultipartFile multiPart) {
-        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
+    /*================================
+           TRANSCRIBE FUNCTIONS
+     =================================*/
+
+    public void transcribeFile(String fileUrl) {
+        // Create request
+        StartTranscriptionJobRequest req = new StartTranscriptionJobRequest();
+        // Set language as english
+        req.withLanguageCode(LanguageCode.EnUS);
+        // Create media object for audio file
+        Media media = new Media();
+        media.setMediaFileUri(fileUrl);
+        // Add media object to request
+        req.withMedia(media);
+
+        // Set job name
+        String transcriptionJobName = generateJobName();
+        req.setTranscriptionJobName(transcriptionJobName);
+        // Set file format
+        String extension = fileUrl.substring(fileUrl.lastIndexOf(".") + 1);
+        req.setMediaFormat(extension);
+
+        // Start transcribe job
+        this.transcribeClient.startTranscriptionJob(req);
+
+        // Get file Id of file
+        Integer fileId = audioFileDao.findByFileUrl(fileUrl).getId();
+
+        // Start listener to check for when job is done
+        new Thread(new Runnable() {
+            public void run() {
+                amazonTranscriptService.listenForJobComplete(transcriptionJobName, fileId);
+            }
+        }).start();
     }
+
+        /*================================
+           UTILITY FUNCTIONS
+     =================================*/
 
     public String uploadFile(MultipartFile multipartFile) {
 
@@ -76,17 +151,21 @@ public class AmazonClientService {
         return fileUrl;
     }
 
-    public Boolean deleteFileFromS3Bucket(String fileUrl) {
-        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-        try {
-            DeleteObjectsRequest delObjReq = new DeleteObjectsRequest(bucketName)
-                    .withKeys(fileName);
-            s3client.deleteObjects(delObjReq);
-            System.out.println("Deleted " + fileUrl + " from bucket.");
-        } catch (SdkClientException e) {
-            return false;
-        }
-        s3client.deleteObject(new DeleteObjectRequest(bucketName + "/", fileName));
-        return true;
+    private File convertMultiPartToFile(MultipartFile file) throws IOException {
+        File convFile = new File(file.getOriginalFilename());
+        FileOutputStream fos = new FileOutputStream(convFile);
+        fos.write(file.getBytes());
+        fos.close();
+        return convFile;
     }
+
+    private String generateFileName(MultipartFile multiPart) {
+        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
+    }
+
+
+    private String generateJobName() {
+        return new Date().getTime() + "";
+    }
+
 }

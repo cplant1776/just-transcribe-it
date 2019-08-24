@@ -7,4 +7,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface TranscriptDao extends CrudRepository<Transcript, Integer> {
     public Integer deleteByFileId(Integer fileId);
+    public Transcript findByJobName(String jobName);
 }

@@ -6,30 +6,27 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "audiofile")
-public class AudioFile {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Table(name = "transcriptexplicit")
+public class TranscriptExplicit {
+
     @Id
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "user_id")
-    private Integer userId;
-
-    @Column(name = "fileUrl")
-    private String fileUrl;
+    @Column(name = "transcript_explicit")
+    private String transcriptExplicit;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
     private Date createTime;
 
-    public AudioFile(Integer userId, String fileUrl) {
-        this.userId = userId;
-        this.fileUrl = fileUrl;
+    public TranscriptExplicit(Integer transcriptId, String transcriptText) {
+        this.id = transcriptId;
+        this.transcriptExplicit = transcriptText;
     }
 
-    public AudioFile() {
+    public TranscriptExplicit() {
 
     }
 
@@ -41,20 +38,12 @@ public class AudioFile {
         this.id = id;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public String getTranscriptExplicit() {
+        return transcriptExplicit;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public String getFileUrl() {
-        return fileUrl;
-    }
-
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
+    public void setTranscriptExplicit(String transcriptExplicit) {
+        this.transcriptExplicit = transcriptExplicit;
     }
 
     public Date getCreateTime() {
