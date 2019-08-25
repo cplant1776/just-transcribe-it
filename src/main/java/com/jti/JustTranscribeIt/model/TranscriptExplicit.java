@@ -9,6 +9,7 @@ import java.util.Date;
 @Table(name = "transcriptexplicit")
 public class TranscriptExplicit {
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
     private Integer id;
@@ -16,13 +17,16 @@ public class TranscriptExplicit {
     @Column(name = "transcript_explicit")
     private String transcriptExplicit;
 
+    @Column(name = "transcript_id")
+    private Integer transcriptId;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
     private Date createTime;
 
     public TranscriptExplicit(Integer transcriptId, String transcriptText) {
-        this.id = transcriptId;
+        this.transcriptId = transcriptId;
         this.transcriptExplicit = transcriptText;
     }
 
@@ -52,5 +56,13 @@ public class TranscriptExplicit {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Integer getTranscriptId() {
+        return transcriptId;
+    }
+
+    public void setTranscriptId(Integer transcriptId) {
+        this.transcriptId = transcriptId;
     }
 }

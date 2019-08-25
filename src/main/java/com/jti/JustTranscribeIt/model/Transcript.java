@@ -22,15 +22,19 @@ public class Transcript {
     @Column(name = "job_name")
     private String jobName;
 
+    @Column(name = "user_id")
+    private Integer userId;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
     private Date createTime;
 
-    public Transcript(Integer fileId, String transcript, String jobName) {
+    public Transcript(Integer fileId, String transcript, String jobName, Integer userId) {
         this.fileId = fileId;
         this.transcript = transcript;
         this.jobName = jobName;
+        this.userId = userId;
     }
 
     public Transcript() {
@@ -75,5 +79,13 @@ public class Transcript {
 
     public void setJobName(String jobName) {
         this.jobName = jobName;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 }

@@ -18,15 +18,19 @@ import com.amazonaws.services.transcribe.model.*;
 import com.jti.JustTranscribeIt.dao.AudioFileDao;
 import com.jti.JustTranscribeIt.dao.TranscriptDao;
 import com.jti.JustTranscribeIt.dao.TranscriptExplicitDao;
+import com.jti.JustTranscribeIt.dao.UserDao;
 import com.jti.JustTranscribeIt.model.AudioFile;
 import com.jti.JustTranscribeIt.model.Transcript;
 import com.jti.JustTranscribeIt.model.TranscriptExplicit;
+import com.jti.JustTranscribeIt.model.User;
 import org.apache.tomcat.util.json.JSONParser;
 import org.aspectj.weaver.ast.Call;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,6 +63,9 @@ public class AmazonClientService {
 
     @Autowired
     private AmazonTranscriptService amazonTranscriptService;
+
+    @Autowired
+    private UserDao userDao;
 
     @PostConstruct
     private void initializeAmazon() {
@@ -120,13 +127,14 @@ public class AmazonClientService {
         // Start transcribe job
         this.transcribeClient.startTranscriptionJob(req);
 
-        // Get file Id of file
+        // Get file Id and logged in user Id
         Integer fileId = audioFileDao.findByFileUrl(fileUrl).getId();
+        Integer userId = getLoggedInId();
 
         // Start listener to check for when job is done
         new Thread(new Runnable() {
             public void run() {
-                amazonTranscriptService.listenForJobComplete(transcriptionJobName, fileId);
+                amazonTranscriptService.listenForJobComplete(transcriptionJobName, fileId, userId);
             }
         }).start();
     }
@@ -166,6 +174,27 @@ public class AmazonClientService {
 
     private String generateJobName() {
         return new Date().getTime() + "";
+    }
+
+    private String getLoggedInUsername() {
+        // Get username of logged-in user
+        String username;
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails)principal).getUsername();
+
+        } else {
+            username = principal.toString();
+        }
+        return username;
+    }
+
+    private Integer getLoggedInId() {
+        String username = getLoggedInUsername();
+        if (username.equals("anonymousUser"))
+            return -1;
+        User user = userDao.findByUsername(username);
+        return user.getId();
     }
 
 }

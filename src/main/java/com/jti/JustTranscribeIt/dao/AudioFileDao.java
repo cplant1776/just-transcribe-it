@@ -10,4 +10,5 @@ public interface AudioFileDao extends CrudRepository<AudioFile, Integer> {
     public AudioFile findByFileUrl(String fileUrl);
 
     public Integer deleteByFileUrl(String fileUrl);
+
 }

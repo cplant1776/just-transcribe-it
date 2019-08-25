@@ -1,13 +1,17 @@
 package com.jti.JustTranscribeIt.model;
 
+
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Entity
-@Table(name = "audiofile")
-public class AudioFile {
+@Table(name = "userusage")
+public class UserUsage {
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
@@ -16,21 +20,25 @@ public class AudioFile {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "fileUrl")
-    private String fileUrl;
+    @Column(name = "transcript_length")
+    private Integer transcriptLength;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
     private Date createTime;
 
-    public AudioFile(Integer userId, String fileUrl, Integer duration) {
-        this.userId = userId;
-        this.fileUrl = fileUrl;
+    @Column(name = "transcript_id")
+    private Integer transcriptId;
+
+    public UserUsage() {
+
     }
 
-    public AudioFile() {
-
+    public UserUsage(Integer userId, Integer transcriptLength, Integer transcriptId) {
+        this.userId = userId;
+        this.transcriptLength = transcriptLength;
+        this.transcriptId = transcriptId;
     }
 
     public Integer getId() {
@@ -49,12 +57,12 @@ public class AudioFile {
         this.userId = userId;
     }
 
-    public String getFileUrl() {
-        return fileUrl;
+    public Integer getTranscriptLength() {
+        return transcriptLength;
     }
 
-    public void setFileUrl(String fileUrl) {
-        this.fileUrl = fileUrl;
+    public void setTranscriptLength(Integer transcriptLength) {
+        this.transcriptLength = transcriptLength;
     }
 
     public Date getCreateTime() {
@@ -63,5 +71,13 @@ public class AudioFile {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public Integer getTranscriptId() {
+        return transcriptId;
+    }
+
+    public void setTranscriptId(Integer transcriptId) {
+        this.transcriptId = transcriptId;
     }
 }
