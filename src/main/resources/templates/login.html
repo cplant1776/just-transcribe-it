@@ -3,30 +3,65 @@
 
 <head>
     <title>Log In</title>
+    <div th:replace="fragments/boilerplate :: css"></div>
 </head>
 
 <body>
-    <form login-page='/customLogin?login_error=1' class="filter text-center" action="/login" method='POST'>
-        <div class="form-label-group">
-            <label for="inputUser">Username</label>
-            <input type="text" name="username" id="inputUser" class="form-control" placeholder="Username" required
-                autofocus>
+
+<div th:replace="fragments/boilerplate :: navbar"></div>
+
+<div id="page-container">
+    <div id="content-wrap">
+        <div class="register">
+            <div class="row">
+                <div class="col-md-3"></div>
+
+                <div class="col-md-6 login-body row">
+                    <div class="col-md-2"></div>
+
+                    <div class="col-md-8">
+                        <form login-page='/customLogin?login_error=1' class="filter text-center" action="/login"
+                              method='POST'>
+                            <div class="form-label-group">
+                                <label for="inputUser"></label>
+                                <input type="text" name="username" id="inputUser" class="form-control form-text-input"
+                                       placeholder="Your Username *" required autofocus>
+                            </div>
+
+                            <div class="form-label-group">
+                                <label for="inputPassword"></label>
+                                <input type="password" name="password" id="inputPassword"
+                                       class="form-control form-text-input" placeholder="Your Password *" required>
+                            </div>
+
+                            <div th:if="${error != null}">
+                                <p class="text-danger text-center my-error-text">
+                                    Invalid credentials. Please try again.
+                                </p>
+                            </div>
+
+                            <button class="btn btn-primary login-btn" name="submit" value="submit" type="submit">Sign in</button>
+                        </form>
+                    </div>
+
+                    <div class="col-md-2"></div>
+
+                </div>
+
+                <div class="col-md-3"></div>
+            </div>
+
         </div>
 
-        <div class="form-label-group">
-            <label for="inputPassword">Password</label>
-            <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password"
-                required>
-        </div>
 
-        <div th:if="${error != null}">
-            <p class="text-danger text-center my-error-text">
-                Invalid credentials. Please try again.
-            </p>
-        </div>
 
-        <button class="site-btn login-btn" name="submit" value="submit" type="submit">Sign in</button>
-    </form>
+
+    </div>
+    <footer id="footer"><div th:replace="fragments/boilerplate :: footer"></div></footer>
+</div>
+
+<div th:replace="fragments/boilerplate :: js"></div>
+
 </body>
 
 </html>

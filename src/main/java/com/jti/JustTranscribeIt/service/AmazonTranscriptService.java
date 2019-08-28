@@ -67,7 +67,7 @@ public class AmazonTranscriptService {
                 .build();
     }
 
-    public void listenForJobComplete(String transcriptionJobName, Integer fileId, Integer userId) {
+    public void listenForJobComplete(String transcriptionJobName, Integer fileId, Integer userId, String userGivenName) {
         System.out.println("Waiting for job completion . . .");
         GetTranscriptionJobRequest jobRequest = new GetTranscriptionJobRequest();
         jobRequest.setTranscriptionJobName(transcriptionJobName);
@@ -80,7 +80,9 @@ public class AmazonTranscriptService {
             if (transcriptionJob.getTranscriptionJobStatus().equals(TranscriptionJobStatus.COMPLETED.name())) {
 
                 try {
-                    this.recordTranscription(transcriptionJob.getTranscript().getTranscriptFileUri(), fileId, userId);
+                    this.recordTranscription(transcriptionJob.getTranscript().getTranscriptFileUri(),
+                            fileId, userId, userGivenName);
+                    System.out.println("Transcription complete!");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -102,7 +104,7 @@ public class AmazonTranscriptService {
         }
     }
 
-    private void recordTranscription(String uri, Integer fileId, Integer userId) throws IOException {
+    private void recordTranscription(String uri, Integer fileId, Integer userId, String userGivenName) throws IOException {
         // Get job response as String
         String res = getResponseAsString(uri);
         // Read response into JSON object
@@ -121,7 +123,7 @@ public class AmazonTranscriptService {
         Integer transcriptLength = getTranscriptLength(items);
 
         // Save basic transcript
-        saveBasicTranscript(fileId, transcript, jobName, userId);
+        saveBasicTranscript(fileId, transcript, jobName, userId, userGivenName);
         // Get id of newly saved transcript
         Integer newTranscriptId = transcriptDao.findByJobName(jobName).getId();
 
@@ -161,8 +163,9 @@ public class AmazonTranscriptService {
         return endJSON.getInt("end_time");
     }
 
-    private void saveBasicTranscript(Integer fileId, String transcript, String jobName, Integer userId) {
-        Transcript newTranscript = new Transcript(fileId, transcript, jobName, userId);
+    private void saveBasicTranscript(Integer fileId, String transcript, String jobName,
+                                     Integer userId, String userGivenName) {
+        Transcript newTranscript = new Transcript(fileId, transcript, jobName, userId, userGivenName);
         transcriptDao.save(newTranscript);
         System.out.println("Saved basic transcript | file id = " + fileId);
     }

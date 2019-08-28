@@ -29,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -106,7 +107,8 @@ public class AmazonClientService {
            TRANSCRIBE FUNCTIONS
      =================================*/
 
-    public void transcribeFile(String fileUrl) {
+    @Async
+    public void transcribeFile(String fileUrl, String userGivenName) {
         // Create request
         StartTranscriptionJobRequest req = new StartTranscriptionJobRequest();
         // Set language as english
@@ -134,7 +136,7 @@ public class AmazonClientService {
         // Start listener to check for when job is done
         new Thread(new Runnable() {
             public void run() {
-                amazonTranscriptService.listenForJobComplete(transcriptionJobName, fileId, userId);
+                amazonTranscriptService.listenForJobComplete(transcriptionJobName, fileId, userId, userGivenName);
             }
         }).start();
     }

@@ -24,7 +24,7 @@ public class AudioFile {
     @Column(name = "create_time")
     private Date createTime;
 
-    public AudioFile(Integer userId, String fileUrl, Integer duration) {
+    public AudioFile(Integer userId, String fileUrl) {
         this.userId = userId;
         this.fileUrl = fileUrl;
     }

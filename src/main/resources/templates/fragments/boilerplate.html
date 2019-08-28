@@ -1,49 +1,93 @@
 <div th:fragment="head">
 
-      <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <!-- Bootstrap CSS -->
-  <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" -->
-        <!-- integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 </div>
 
 
 <div th:fragment="css">
+    <link rel="stylesheet" th:href="@{~/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{~/css/style.css}" />
+</div>
 
-    <!-- Bootstrap CSS -->
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
-        
-    <link rel="stylesheet" th:href="@{~/css/bootstrap.min.css}"/>
-	<!-- <link rel="stylesheet" th:href="@{~/css/font-awesome.min.css}"/>
-	<link rel="stylesheet" th:href="@{~/css/slicknav.min.css}"/>
-	<link rel="stylesheet" th:href="@{~/css/owl.carousel.min.css}"/>
-	<link rel="stylesheet" th:href="@{~/css/magnific-popup.css}"/>
-    <link rel="stylesheet" th:href="@{~/css/animate.css}"/>
-    <link rel="stylesheet" th:href="@{~/css/style.css}"/> -->
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-bg-color justify-content-between" th:fragment="navbar">
+    <div class="navbar-nav">
+        <a class="navbar-brand navbar-brand-text" href="/">
+            <img class="navbar-img" th:src="@{~/img/icon/navbar-brand.png}">
+            Just Transcribe It!</a>
+    </div>
 
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link active navbar-text" href="/">Home <span class="sr-only">(current)</span></a>
+            <a class="nav-item nav-link active navbar-text" href="/account">My Account <span
+                    class="sr-only">(current)</span></a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle active navbar-text" href="#" id="navbarDropdownMenuLink"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Trancriptions
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="/transcribe/new">New Transcription</a>
+                    <a class="dropdown-item" href="/account/transcripts">My Transcriptions</a>
+                </div>
+            </li>
+        </div>
+    </div>
+</nav>
+
+
+<!-- Footer -->
+<div class="footer" th:fragment="footer">
+
+    <div class="row footer-body">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <div class="d-flex justify-content-between icon-group">
+
+
+                <a href="/">
+                    <div class="d-flex flex-column align-items-center">
+                        <img class="footer-icon" th:src="@{~/img/icon/homepage.png}">
+                        <p class="text-white">Home</p>
+                    </div>
+                </a>
+
+                <a href="/account">
+                    <div class="d-flex flex-column align-items-center">
+                        <img class="footer-icon" th:src="@{~/img/icon/user.png}">
+                        <p class="text-white">Account</p>
+                    </div>
+
+                </a>
+
+                <a href="/transcribe/new">
+                    <div class="d-flex flex-column align-items-center">
+                        <img class="footer-icon" th:src="@{~/img/icon/edit.png}">
+                        <p class="text-white">Transcribe</p>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+
+    <div class="d-flex justify-content-center footer-btm">
+        <p class="footer-btm-text">@2019 Copyright: <span class="text-white">Caleb Plant</span></p>
+    </div>
 </div>
 
 
+
 <div th:fragment="js">
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script> -->
-
     <script th:src="@{~/js/jquery-3.2.1.min.js}"></script>
-	<script th:src="@{~/js/bootstrap.min.js}"></script>
-	<!-- <script th:src="@{~/js/jquery.slicknav.min.js}"></script>
-	<script th:src="@{~/js/owl.carousel.min.js}"></script>
-	<script th:src="@{~/js/main.js}"></script> -->
+    <script th:src="@{~/js/bootstrap.min.js}"></script>
 </div>

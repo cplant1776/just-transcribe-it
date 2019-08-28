@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
+
 @Controller
 @RequestMapping("/transcribe")
 public class TranscriptController {
@@ -29,9 +31,12 @@ public class TranscriptController {
     }
 
     @PostMapping("/new")
-    private String newTranscriptPage(@RequestParam(name = "fileUrl") String fileUrl, Model model) {
+    private String newTranscriptPage(@RequestParam(name = "fileUrl") String fileUrl,
+                                     @RequestParam(name = "userGivenName") String userGivenName,
+                                     Model model) {
         // Amazon Client asynchronously records new transcript in DB when transcription job is complete
-        amazonClientService.transcribeFile(fileUrl);
+        System.out.println("Transcribe request received - " + userGivenName);
+            amazonClientService.transcribeFile(fileUrl, userGivenName);
         return "index";
     }
 

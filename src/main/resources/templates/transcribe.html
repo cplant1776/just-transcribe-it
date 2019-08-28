@@ -9,15 +9,64 @@
 
 <body>
 
-    <h2>Transcribe a file</h2>
-    <form enctype="multipart/form-data" action="/transcribe/new" name="transcribeForm" id="transcribeForm" method="POST">
-        <input type="text" placeholder="url" name="fileUrl">
+<div th:replace="fragments/boilerplate :: navbar"></div>
 
-        <input type="submit" value="submit" id="transcribeBtn">
-    </form>
+<div id="page-container">
+    <div id="content-wrap">
 
-    <div th:replace="fragments/boilerplate :: js"></div>
-    <script type="text/javascript" th:src="@{~/js/transcribe.js}"></script>
+        <div class="register">
+            <div class="row">
+                <div class="col-md-3"></div>
+
+                <div class="col-md-6 login-body row">
+                    <div class="col-md-2"></div>
+
+                    <div class="col-md-8" role="document">
+
+                        
+                        <form enctype="multipart/form-data" action="/storage/uploadFile" method="POST">
+                            <div class="form-label-group">
+                                <label for="userGivenName">Transcript Name</label>
+                                <input type="text" name="userGivenName" id="userGivenName"
+                                       class="form-control form-text-input" placeholder="Enter Transcript Name" required
+                                       autofocus>
+                            </div>
+
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="customFile" name="file">
+                                <label class="custom-file-label" for="customFile">Choose file</label>
+                            </div>
+
+                            <button class="btn btn-primary login-btn" name="submit" value="submit"
+                                    type="submit">Transcribe!</button>
+                        </form>
+                    </div>
+
+                    <div class="col-md-2"></div>
+
+                </div>
+
+                <div class="col-md-3"></div>
+            </div>
+
+        </div>
+
+    </div>
+    <footer id="footer">
+        <div th:replace="fragments/boilerplate :: footer"></div>
+    </footer>
+</div>
+
+<h2>Transcribe a file</h2>
+<form enctype="multipart/form-data" action="/transcribe/new" name="transcribeForm" id="transcribeForm"
+      method="POST">
+    <input type="text" placeholder="url" name="fileUrl">
+
+    <input type="submit" value="submit" id="transcribeBtn">
+</form>
+
+<div th:replace="fragments/boilerplate :: js"></div>
+<script type="text/javascript" th:src="@{~/js/transcribe.js}"></script>
 
 </body>
 
