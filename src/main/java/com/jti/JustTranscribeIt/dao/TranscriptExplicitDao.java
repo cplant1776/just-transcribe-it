@@ -6,4 +6,5 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public interface TranscriptExplicitDao extends CrudRepository<TranscriptExplicit, Integer> {
+    public Integer deleteByTranscriptId(Integer transcriptId);
 }

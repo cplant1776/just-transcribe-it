@@ -2,14 +2,12 @@ package com.jti.JustTranscribeIt.controller;
 
 import com.jti.JustTranscribeIt.dao.TranscriptDao;
 import com.jti.JustTranscribeIt.dao.TranscriptExplicitDao;
+import com.jti.JustTranscribeIt.model.Transcript;
 import com.jti.JustTranscribeIt.service.AmazonClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -43,6 +41,16 @@ public class TranscriptController {
     @GetMapping("/new")
     private String newTranscriptPageGet(Model model) {
         return "transcribe";
+    }
+
+    @GetMapping("/view/{transcriptId}")
+    private String viewTranscriptPageGet(@PathVariable(name = "transcriptId", required = true) Integer transcriptId,
+                                         Model model) {
+        // Add transcript to model
+        Transcript transcript = transcriptDao.findById(transcriptId).get();
+        model.addAttribute("transcript", transcript);
+
+        return "transcription";
     }
 
 }

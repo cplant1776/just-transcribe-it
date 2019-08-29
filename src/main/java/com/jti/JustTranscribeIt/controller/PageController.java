@@ -1,9 +1,13 @@
 package com.jti.JustTranscribeIt.controller;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.jti.JustTranscribeIt.dao.AudioFileDao;
 import com.jti.JustTranscribeIt.dao.TranscriptDao;
 import com.jti.JustTranscribeIt.dao.UserDao;
+import com.jti.JustTranscribeIt.dao.UserUsageDao;
 import com.jti.JustTranscribeIt.model.Transcript;
 import com.jti.JustTranscribeIt.model.User;
+import com.jti.JustTranscribeIt.service.AmazonClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -23,6 +29,15 @@ public class PageController {
 
     @Autowired
     private TranscriptDao transcriptDao;
+
+    @Autowired
+    private AudioFileDao audioFileDao;
+
+    @Autowired
+    private UserUsageDao userUsageDao;
+
+    @Autowired
+    private AmazonClientService amazonClientService;
 
     @GetMapping("/")
     public String indexPage(Model model) {
@@ -47,7 +62,6 @@ public class PageController {
     public String accountRedirect(Model model) {
         // Get logged-in userId
         User user = userDao.findByUsername(getLoggedInUsername());
-//        User user = userDao.findByUsername("jc");
         if (user!= null)
         {
             Integer userId = user.getId();
@@ -63,13 +77,9 @@ public class PageController {
         // Add user to model
         User user = userDao.findById(id).get();
         model.addAttribute("user", user);
-        // Add user's transcripts to model
-        List<Transcript> transcripts = transcriptDao.findByUserId(user.getId());
-        model.addAttribute("transcripts", transcripts);
 
         // Check if logged-in user is authorized for this page
         User attemptedUser = userDao.findByUsername(getLoggedInUsername());
-//        User attemptedUser = userDao.findByUsername("jc");
         if (attemptedUser == null || user == null)
         {
             model.addAttribute("incorrectUser", true);
@@ -80,6 +90,22 @@ public class PageController {
             model.addAttribute("incorrectUser", true);
         else
             model.addAttribute("incorrectUser", false);
+
+        // Add user's transcripts to model
+        List<Transcript> transcripts = transcriptDao.findByUserId(user.getId());
+        model.addAttribute("transcripts", transcripts);
+
+        // Generate authorized Urls to user's transcriptions
+        List<String> authorizedUrls = new ArrayList<>();
+        for(Transcript transcript: transcripts) {
+            String fileUrl = audioFileDao.findById(transcript.getFileId()).get().getFileUrl();
+            authorizedUrls.add(amazonClientService.getPresignedUrl(fileUrl));
+        }
+        model.addAttribute("authorizedUrls", authorizedUrls);
+
+        // Add user's monthly usage to model
+        Integer monthUsage = userUsageDao.getMonthlySum(user.getId());
+        model.addAttribute("monthUsage", monthUsage);
 
         return "account";
     }

@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.jti.JustTranscribeIt.dao.AudioFileDao;
 import com.jti.JustTranscribeIt.dao.TranscriptDao;
+import com.jti.JustTranscribeIt.dao.TranscriptExplicitDao;
 import com.jti.JustTranscribeIt.dao.UserDao;
 import com.jti.JustTranscribeIt.model.AudioFile;
 import com.jti.JustTranscribeIt.model.User;
@@ -63,6 +64,9 @@ public class BucketController {
     private TranscriptDao transcriptDao;
 
     @Autowired
+    private TranscriptExplicitDao transcriptExplicitDao;
+
+    @Autowired
     BucketController(AmazonClientService amazonClientService) {
         this.amazonClientService = amazonClientService;
     }
@@ -91,14 +95,32 @@ public class BucketController {
     }
 
     @DeleteMapping("/deleteFile")
-    public String deleteFile(@RequestPart(value = "fileUrl") String fileUrl) {
-        // Delete file at destination url from bucket
+    public String delete(@RequestParam(value = "transcriptId") Integer transcriptId) {
+        // Get file Url
+        Integer fileId = transcriptDao.findById(transcriptId).get().getFileId();
+        String fileUrl = audioFileDao.findById(fileId).get().getFileUrl();
+        // Delete file from bucket
         Boolean wasDeleted = this.amazonClientService.deleteFileFromS3Bucket(fileUrl);
         // Get deleted file ID
         Integer deletedFileId = audioFileDao.findByFileUrl(fileUrl).getId();
 
-        // Delete file from DB
-        if(wasDeleted) {
+        if (wasDeleted) {
+            // Delete explicit transcript
+            Integer deleteExplicitTranscript = transcriptExplicitDao.deleteByTranscriptId(transcriptId);
+            if (deleteExplicitTranscript == 0) {
+                System.out.println("Failed to delete explicit transcript for " + deletedFileId + " from DB!");
+            } else {
+                System.out.println("Deleted explicit transcript for " + deletedFileId + " from DB!");
+            }
+
+            // Delete transcript
+            Integer deleteTranscript = transcriptDao.deleteByFileId(deletedFileId);
+            if (deleteTranscript == 0) {
+                System.out.println("Failed to delete transcript for " + deletedFileId + " from DB!");
+            } else {
+                System.out.println("Deleted transcript for " + deletedFileId + " from DB!");
+            }
+
             // Delete audio file
             Integer deleteFile = audioFileDao.deleteByFileUrl(fileUrl);
             if (deleteFile == 0) {
@@ -106,16 +128,7 @@ public class BucketController {
             } else {
                 System.out.println("Deleted audio file (" + fileUrl + ") from DB!");
             }
-
-            // Delete audio file transcripts
-            Integer deleteTranscript = transcriptDao.deleteByFileId(deletedFileId);
-            if (deleteFile == 0) {
-                System.out.println("Failed to delete transcript for " + deletedFileId + " from DB!");
-            } else {
-                System.out.println("Deleted transcript for " + deletedFileId + " from DB!");
-            }
         }
-
         return "index";
     }
 

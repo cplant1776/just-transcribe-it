@@ -1,0 +1,158 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <title>Log In</title>
+    <div th:replace="fragments/boilerplate :: css"></div>
+</head>
+
+<body>
+
+    <div th:replace="fragments/boilerplate :: navbar"></div>
+
+    <div id="page-container">
+        <div id="content-wrap">
+            <div class="register">
+                <div class="row">
+                    <div class="col-md-3"></div>
+
+                    <div class="col-md-6 login-body row">
+                        <div class="col-md-3"></div>
+
+                        <div class="col-md-6 text-center">
+                            <h2>Account Details</h2>
+
+                            <div class="d-flex justify-content-between">
+                                <p class="account-detail-text"><b>Username:</b></p>
+                                <p class="account-detail-text" th:text="${user.username}"></p>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <p class="account-detail-text"><b>Password:</b></p>
+                                <p class="account-detail-text" id="pwField">********</p>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <p class="account-detail-text"><b>Join Date:</b></p>
+                                <p class="account-detail-text" th:text="${#strings.substring(user.createTime,0,10)}"></p>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                    <p class="account-detail-text"><b>Month Usage: </b></p>
+                                    <p class="account-detail-text" th:text="${monthUsage} + ' / 600 seconds'"></p>
+                                </div>
+
+                            <div class="text-center">
+                                <button type="button" class="btn btn-primary" onclick="return false"
+                                    id="changePasswordBtn">Change Password</button>
+                            </div>
+
+                            <div hidden>
+                                <div class="edit-pw-popout">
+                                    <form action="/account/update-password">
+                                        <div class="form-label-group">
+                                            <label for="currentPassword"></label>
+                                            <input type="password" id="currentPassword" name="currentPassword"
+                                                placeholder="Your Current Password *" class="form-text-input">
+                                        </div>
+                                        <div class="form-label-group">
+                                            <label for="newPassword"></label>
+                                            <input type="password" id="newPassword" name="newPassword"
+                                                placeholder="Your New Password *" class="form-text-input">
+                                        </div>
+                                        <div class="form-label-group">
+                                            <label for="confirmNewPassword"></label>
+                                            <input type="password" id="confirmNewPassword" name="confirmNewPassword"
+                                                placeholder="Confirm New Password *" class="form-text-input">
+                                        </div>
+
+                                        <button class="btn btn-primary login-btn" name="submit" value="submit"
+                                            type="submit">Change Password</button>
+
+                                        <input type="hidden" name="_method" value="delete">
+
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3"></div>
+
+                    </div>
+
+                    <div class="col-md-3"></div>
+                </div>
+
+                <div class="row transcript-history">
+                    <div class="col-md-2"></div>
+                    <div class="col-md-8">
+                        <div class="row login-body">
+                            <div class="col-md-12 text-center">
+                                <h2>Your Transcription History</h2>
+
+                                <div th:unless="${transcripts.isEmpty()}">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 20%">Name</th>
+                                                <th style="width: 30%">Date</th>
+                                                <th style="width: 40%">Transcript</th>
+                                                <th style="width: 10%"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <th:block th:each="transcript, count: ${transcripts}">
+                                                <tr>
+                                                    <!-- <td>name</td> -->
+                                                    <td><a th:href="@{${authorizedUrls[count.index]}}" th:text="${transcript.userGivenName}" target="_blank" rel="noopener noreferrer"></a></td>
+                                                    <!-- date -->
+                                                    <td th:text="${#strings.substring(transcript.createTime,0,10)}"></td>
+                                                    <!-- transcript -->
+                                                    <td>
+                                                        <span th:text="${transcript.transcript}" class="d-inline-block text-truncate" style="max-width: 150px;"></span>
+                                                    </td>
+                                                    <!-- View Transcript -->
+                                                    <td>
+                                                        <button class="button btn btn-success" onclick="return false;" th:id="'transcript-btn-' + ${transcript.id}">View</button>
+                                                    </td>
+                                                </tr>
+                                            </th:block>
+                                        </tbody>
+                                    </table>
+                                    <form action="/transcribe/new" method="GET">
+                                        <input type="submit" class="btn btn-primary" name=""
+                                            value="New Transcript" /><br />
+                                    </form>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+
+            </div>
+
+
+
+
+        </div>
+        <footer id="footer">
+            <div th:replace="fragments/boilerplate :: footer"></div>
+        </footer>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var transcripts = /*[[${transcripts}]]*/ 'default';
+            /*]]>*/
+    </script>
+
+    <div th:replace="fragments/boilerplate :: js"></div>
+    <script type="text/javascript" th:src="@{~/js/account.js}"></script>
+
+</body>
+
+</html>
