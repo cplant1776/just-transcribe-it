@@ -3,10 +3,7 @@ package com.jti.JustTranscribeIt.controller;
 
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.jti.JustTranscribeIt.dao.AudioFileDao;
-import com.jti.JustTranscribeIt.dao.TranscriptDao;
-import com.jti.JustTranscribeIt.dao.TranscriptExplicitDao;
-import com.jti.JustTranscribeIt.dao.UserDao;
+import com.jti.JustTranscribeIt.dao.*;
 import com.jti.JustTranscribeIt.model.AudioFile;
 import com.jti.JustTranscribeIt.model.User;
 import com.jti.JustTranscribeIt.service.AmazonClientService;
@@ -67,6 +64,9 @@ public class BucketController {
     private TranscriptExplicitDao transcriptExplicitDao;
 
     @Autowired
+    private GeneratedUrlDao generatedUrlDao;
+
+    @Autowired
     BucketController(AmazonClientService amazonClientService) {
         this.amazonClientService = amazonClientService;
     }
@@ -105,6 +105,14 @@ public class BucketController {
         Integer deletedFileId = audioFileDao.findByFileUrl(fileUrl).getId();
 
         if (wasDeleted) {
+            // Delete generated Urls
+            Integer deleteGeneratedUrl = generatedUrlDao.deleteByTranscriptId(transcriptId);
+            if (deleteGeneratedUrl == 0) {
+                System.out.println("Failed to delete generated Url for " + deletedFileId + " from DB!");
+            } else {
+                System.out.println("Deleted generated Url for " + deletedFileId + " from DB!");
+            }
+
             // Delete explicit transcript
             Integer deleteExplicitTranscript = transcriptExplicitDao.deleteByTranscriptId(transcriptId);
             if (deleteExplicitTranscript == 0) {

@@ -1,10 +1,8 @@
 package com.jti.JustTranscribeIt.controller;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.jti.JustTranscribeIt.dao.AudioFileDao;
-import com.jti.JustTranscribeIt.dao.TranscriptDao;
-import com.jti.JustTranscribeIt.dao.UserDao;
-import com.jti.JustTranscribeIt.dao.UserUsageDao;
+import com.jti.JustTranscribeIt.dao.*;
+import com.jti.JustTranscribeIt.model.GeneratedUrl;
 import com.jti.JustTranscribeIt.model.Transcript;
 import com.jti.JustTranscribeIt.model.User;
 import com.jti.JustTranscribeIt.service.AmazonClientService;
@@ -17,9 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class PageController {
@@ -35,6 +32,9 @@ public class PageController {
 
     @Autowired
     private UserUsageDao userUsageDao;
+
+    @Autowired
+    private GeneratedUrlDao generatedUrlDao;
 
     @Autowired
     private AmazonClientService amazonClientService;
@@ -80,28 +80,58 @@ public class PageController {
 
         // Check if logged-in user is authorized for this page
         User attemptedUser = userDao.findByUsername(getLoggedInUsername());
-        if (attemptedUser == null || user == null)
+        if (attemptedUser == null || (attemptedUser.getId() != user.getId()) )
         {
             model.addAttribute("incorrectUser", true);
             return "account";
-        }
-
-        if (attemptedUser.getId() != user.getId())
-            model.addAttribute("incorrectUser", true);
-        else
+        } else {
             model.addAttribute("incorrectUser", false);
+        }
 
         // Add user's transcripts to model
         List<Transcript> transcripts = transcriptDao.findByUserId(user.getId());
         model.addAttribute("transcripts", transcripts);
+        // Get list of user's transcripts' ids
+        List<Integer> transcriptIds = transcripts.stream().map(Transcript::getId).collect(Collectors.toList());
 
-        // Generate authorized Urls to user's transcriptions
-        List<String> authorizedUrls = new ArrayList<>();
-        for(Transcript transcript: transcripts) {
-            String fileUrl = audioFileDao.findById(transcript.getFileId()).get().getFileUrl();
-            authorizedUrls.add(amazonClientService.getPresignedUrl(fileUrl));
+        // If non-expired link to audio file already exists, map it to urlMap
+        HashMap<Integer, String> urlMap = new HashMap<Integer, String>();
+        if (!transcriptIds.isEmpty()) {
+            urlMap = mapExistingGeneratedUrls(transcriptIds);
         }
-        model.addAttribute("authorizedUrls", authorizedUrls);
+
+        // If non-expired link doesn't exist, add its id to toGenerate
+        List<Integer> toGenerate = new ArrayList<Integer>();
+        if (!urlMap.isEmpty()) {
+            for(Integer i: transcriptIds) {
+                if(!urlMap.keySet().contains(i)) {
+                    toGenerate.add(i);
+                }
+            }
+        } else {
+            // Must generate all links
+            toGenerate = transcriptIds;
+        }
+
+        // Generate and map authorized Urls to user's audio files
+        String authorizedUrl;
+        if (!toGenerate.isEmpty()) {
+
+//            if (urlMap.isEmpty()) { // case: all files must be generated
+//                toGenerate = transcriptIds;
+//            }
+
+            for(Integer i: toGenerate) {
+                // Map file url to transcript Id
+                String fileUrl = audioFileDao.findById(transcriptDao.findById(i).get().getFileId()).get().getFileUrl();
+                authorizedUrl = amazonClientService.getPresignedUrl(fileUrl);
+                urlMap.put(i, authorizedUrl);
+                // Save generated URL in DB
+                generatedUrlDao.save(new GeneratedUrl(i, authorizedUrl));
+            }
+        }
+
+        model.addAttribute("urlMap", urlMap);
 
         // Add user's monthly usage to model
         Integer monthUsage = userUsageDao.getMonthlySum(user.getId());
@@ -122,6 +152,18 @@ public class PageController {
         }
 
         return username;
+    }
+
+    private HashMap<Integer, String> mapExistingGeneratedUrls(List<Integer> ids) {
+        HashMap<Integer, String> result = new HashMap<Integer, String>();
+        // Generate map (transcriptId, GeneratedUrl) for URLs less than an hour old
+        ArrayList<Object[]> queryResult = generatedUrlDao.mapGeneratedUrls(ids);
+        for (Object[] res : queryResult) {
+            result.put((Integer) res[0], (String) res[1]);
+        }
+
+        return Objects.requireNonNullElseGet(result, HashMap::new);
+
     }
 
 }

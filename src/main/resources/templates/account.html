@@ -105,7 +105,8 @@
                                             <th:block th:each="transcript, count: ${transcripts}">
                                                 <tr>
                                                     <!-- <td>name</td> -->
-                                                    <td><a th:href="@{${authorizedUrls[count.index]}}" th:text="${transcript.userGivenName}" target="_blank" rel="noopener noreferrer"></a></td>
+                                                    <td><a th:href="@{${urlMap.get(transcript.id)}}" th:text="${transcript.userGivenName}" target="_blank" rel="noopener noreferrer"></a></td>
+                                                    <!-- <td><a th:href="@{${authorizedUrls[count.index]}}" th:text="${transcript.userGivenName}" target="_blank" rel="noopener noreferrer"></a></td> -->
                                                     <!-- date -->
                                                     <td th:text="${#strings.substring(transcript.createTime,0,10)}"></td>
                                                     <!-- transcript -->
