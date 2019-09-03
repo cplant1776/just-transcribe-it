@@ -3,6 +3,7 @@
 A web app for users to upload and transcribe audio files into text. Built using the Spring framework and utilizing AWS S3, EC2, RDS, EB, and Transcribe.
 
 ## Link to App
+
 [Just show me the app!](http://jti-env-1.us-east-1.elasticbeanstalk.com/) Note: a couple UI elements have not yet been added, such as seeing a transcription job's status (pending, failed, etc.).
 
 ## Motivation
@@ -18,6 +19,7 @@ I started this project to further expand on what I have learned about web app de
 * User accounts and authentication
 * Transcription and storage of user-uploaded audio files
 * Authenticated, expiring links to user audio files
+* Monthly usage limits
 
 ## Some Screenshots
 
@@ -26,7 +28,6 @@ I started this project to further expand on what I have learned about web app de
 
 ## Current Roadmap (To-Do)
 
-1. Finish implementing enforcement of user monthly usage limitations
 1. Add user authentication to DELETE endpoint
 1. Make UI more user-friendly (error pages, more failure message, transcription status)
 1. Allow download of .txt file for completed transcriptions

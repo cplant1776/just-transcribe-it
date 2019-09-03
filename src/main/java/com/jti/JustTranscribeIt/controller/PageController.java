@@ -44,11 +44,6 @@ public class PageController {
         return "index";
     }
 
-    @GetMapping("/delete")
-    public String deletePage(Model model) {
-        return "delete";
-    }
-
     @GetMapping("/login")
     public String loginPage(@RequestParam(name = "error", required = false) String error, Model model) {
         if (error != null)

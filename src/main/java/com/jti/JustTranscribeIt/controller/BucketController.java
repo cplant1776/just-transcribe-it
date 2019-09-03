@@ -67,6 +67,9 @@ public class BucketController {
     private GeneratedUrlDao generatedUrlDao;
 
     @Autowired
+    private UserUsageDao userUsageDao;
+
+    @Autowired
     BucketController(AmazonClientService amazonClientService) {
         this.amazonClientService = amazonClientService;
     }
@@ -82,16 +85,31 @@ public class BucketController {
         String fileUrl = this.amazonClientService.uploadFile(file);
         System.out.println("Audio file (" + fileUrl + ") uploaded to bucket!");
 
-        // Create new entry in audio_file table
+        // Check user monthly usage
         Integer loggedInId = getLoggedInId();
-        AudioFile audioFile = new AudioFile(loggedInId, fileUrl);
-        audioFileDao.save(audioFile);
-        System.out.println("Audio file (" + fileUrl + ") added to DB!");
+        Integer monthlyUsage = userUsageDao.getMonthlySum(loggedInId);
 
-        // Start asynchronous transcription of uploaded file
-        amazonClientService.transcribeFile(fileUrl, userGivenName);
+        if (monthlyUsage >= 600)
+        {
+            System.out.println("User " + loggedInId + " usage limit exceeded.");
+            model.addAttribute("messageType", "Error Encountered");
+            model.addAttribute("messageBody", "You have reached your usage limit for this month. Please try again next month!");
+            return "message";
+        }
 
-        return "index";
+        else {
+            // Create new entry in audio_file table
+            AudioFile audioFile = new AudioFile(loggedInId, fileUrl);
+            audioFileDao.save(audioFile);
+            System.out.println("Audio file (" + fileUrl + ") added to DB!");
+
+            // Start asynchronous transcription of uploaded file
+            amazonClientService.transcribeFile(fileUrl, userGivenName);
+
+            return "index";
+        }
+
+
     }
 
     @DeleteMapping("/deleteFile")

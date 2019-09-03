@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <div th:replace="fragments/boilerplate :: css"></div>
+</head>
+
+<body>
+
+    <div th:replace="fragments/boilerplate :: navbar"></div>
+
+    <div id="page-container">
+        <div id="content-wrap">
+            <div class="register">
+                <div class="row">
+                    <div class="col-md-3"></div>
+
+                    <div class="col-md-6 login-body row">
+                        <div class="col-md-3"></div>
+
+                        <div class="col-md-6 text-center">
+                            <h2 th:text="${messageType}"></h2>
+
+                            <div class="d-flex justify-content-between">
+                                <p class="account-detail-text" th:text="${messageBody}"></p>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="button" class="btn btn-primary" onclick="return false"
+                                    id="previousPageBtn">Go Back</button>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3"></div>
+
+                    </div>
+
+                    <div class="col-md-3"></div>
+                </div>
+
+    <div th:replace="fragments/boilerplate :: js"></div>
+    <script type="text/javascript" th:src="@{~/js/message.js}"></script>
+
+</body>
+
+</html>
