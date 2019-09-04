@@ -10,8 +10,8 @@ function sendDeleteReq () {
             console.log("DELETE WAS SUCCESSFUL");
             window.location.href = "/account";
         },
-        error: function(msg){
-            console.log("ERROR: " + msg)
+        error: function(e){
+            console.log("ERROR: " + e)
         },
         beforeSend: function() {
             "sending..."

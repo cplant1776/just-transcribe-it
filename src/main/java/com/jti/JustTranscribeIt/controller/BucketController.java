@@ -10,7 +10,6 @@ import com.jti.JustTranscribeIt.service.AmazonClientService;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -29,6 +28,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.naming.AuthenticationException;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -113,14 +113,20 @@ public class BucketController {
     }
 
     @DeleteMapping("/deleteFile")
-    public String delete(@RequestParam(value = "transcriptId") Integer transcriptId) {
+    @ResponseBody
+    public String delete(@RequestParam(value = "transcriptId") Integer transcriptId, Model model) throws AuthenticationException {
+        // Check if user is authorized
+        Integer loggedInId = getLoggedInId();
+        Integer fileCreatorId = transcriptDao.findById(transcriptId).get().getUserId();
+        if (loggedInId != fileCreatorId)
+            throw new AuthenticationException("Logged in ID doesn't match creator id: ("
+                                                + loggedInId + "| " + fileCreatorId + ")");
         // Get file Url
-        Integer fileId = transcriptDao.findById(transcriptId).get().getFileId();
-        String fileUrl = audioFileDao.findById(fileId).get().getFileUrl();
+        Integer deletedFileId = transcriptDao.findById(transcriptId).get().getFileId();
+        String fileUrl = audioFileDao.findById(deletedFileId).get().getFileUrl();
         // Delete file from bucket
         Boolean wasDeleted = this.amazonClientService.deleteFileFromS3Bucket(fileUrl);
-        // Get deleted file ID
-        Integer deletedFileId = audioFileDao.findByFileUrl(fileUrl).getId();
+
 
         if (wasDeleted) {
             // Delete generated Urls
@@ -155,7 +161,7 @@ public class BucketController {
                 System.out.println("Deleted audio file (" + fileUrl + ") from DB!");
             }
         }
-        return "index";
+        return "Deleted" + transcriptId;
     }
 
 
