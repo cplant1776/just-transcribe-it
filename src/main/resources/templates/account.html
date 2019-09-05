@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head>
-    <title>Log In</title>
+    <title>My Account</title>
     <div th:replace="fragments/boilerplate :: css"></div>
 </head>
 
@@ -103,29 +103,51 @@
                                         </thead>
                                         <tbody>
                                             <th:block th:each="transcript, count: ${transcripts}">
-                                                <tr>
-                                                    <!-- <td>name</td> -->
-                                                    <td><a th:href="@{${urlMap.get(transcript.id)}}" th:text="${transcript.userGivenName}" target="_blank" rel="noopener noreferrer"></a></td>
-                                                    <!-- <td><a th:href="@{${authorizedUrls[count.index]}}" th:text="${transcript.userGivenName}" target="_blank" rel="noopener noreferrer"></a></td> -->
+                                                <!-- Status == COMPLETE -->
+                                                <tr th:if="${transcript.status == T(com.jti.JustTranscribeIt.Status).COMPLETE}">
+                                                    <!-- name -->
+                                                    <td>
+                                                        <a th:href="@{${urlMap.get(transcript.id)}}" th:text="${transcript.userGivenName}" target="_blank" rel="noopener noreferrer"></a>                                                            
+                                                    </td>
                                                     <!-- date -->
                                                     <td th:text="${#strings.substring(transcript.createTime,0,10)}"></td>
                                                     <!-- transcript -->
                                                     <td>
                                                         <span th:text="${transcript.transcript}" class="d-inline-block text-truncate" style="max-width: 150px;"></span>
                                                     </td>
-                                                    <!-- View Transcript -->
+                                                    <!-- View Transcript Button-->
                                                     <td>
                                                         <button class="button btn btn-success" onclick="return false;" th:id="'transcript-btn-' + ${transcript.id}">View</button>
                                                     </td>
                                                 </tr>
+                                                <!-- STATUS == PENDING -->
+                                                <tr th:if="${transcript.status == T(com.jti.JustTranscribeIt.Status).PENDING}">
+                                                    <td>
+                                                        <p th:text="${transcript.userGivenName}"></p>
+                                                    </td>
+                                                    <td>
+                                                        <p th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"></p>
+                                                    </td>
+                                                    <td>
+                                                        <p>Pending completion . . .</p>
+                                                    </td>
+                                                    <td>
+                                                            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+                                                    </td>
+                                                </tr>
+                                                <!-- STATUS = FAILED -->
+                                                <tr th:if="${transcript.status == T(com.jti.JustTranscribeIt.Status).FAILED}" colspan="4" class="text-center">
+                                                    <p>Failed . . .</p>
+                                                </tr>
                                             </th:block>
                                         </tbody>
                                     </table>
-                                    <form action="/transcribe/new" method="GET">
-                                        <input type="submit" class="btn btn-primary" name=""
-                                            value="New Transcript" /><br />
-                                    </form>
                                 </div>
+
+                                <form action="/transcribe/new" method="GET">
+                                    <input type="submit" class="btn btn-primary" name=""
+                                        value="New Transcript" /><br />
+                                </form>
 
                             </div>
 

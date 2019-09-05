@@ -1,5 +1,6 @@
 package com.jti.JustTranscribeIt.model;
 
+import com.jti.JustTranscribeIt.Status;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -28,6 +29,10 @@ public class Transcript {
     @Column(name = "user_given_name")
     private String userGivenName;
 
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
@@ -39,6 +44,13 @@ public class Transcript {
         this.jobName = jobName;
         this.userId = userId;
         this.userGivenName = userGivenName;
+    }
+
+    public Transcript(Integer userId, String userGivenName, Integer audioFileId) {
+        this.userId = userId;
+        this.userGivenName = userGivenName;
+        this.fileId = audioFileId;
+        this.status = Status.PENDING;
     }
 
     public Transcript() {
@@ -99,5 +111,13 @@ public class Transcript {
 
     public void setUserGivenName(String userGivenName) {
         this.userGivenName = userGivenName;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 }

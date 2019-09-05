@@ -132,12 +132,11 @@ public class AmazonClientService {
 
         // Get file Id and logged in user Id
         Integer fileId = audioFileDao.findByFileUrl(fileUrl).getId();
-        Integer userId = getLoggedInId();
 
         // Start listener to check for when job is done
         new Thread(new Runnable() {
             public void run() {
-                amazonTranscriptService.listenForJobComplete(transcriptionJobName, fileId, userId, userGivenName);
+                amazonTranscriptService.listenForJobComplete(transcriptionJobName, fileId);
             }
         }).start();
     }

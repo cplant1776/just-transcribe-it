@@ -28,7 +28,6 @@ I started this project to further expand on what I have learned about web app de
 
 ## Current Roadmap (To-Do)
 
-1. Add user authentication to DELETE endpoint
 1. Make UI more user-friendly (error pages, more failure message, transcription status)
 1. Allow download of .txt file for completed transcriptions
 

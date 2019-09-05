@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.jti.JustTranscribeIt.dao.*;
 import com.jti.JustTranscribeIt.model.AudioFile;
+import com.jti.JustTranscribeIt.model.Transcript;
 import com.jti.JustTranscribeIt.model.User;
 import com.jti.JustTranscribeIt.service.AmazonClientService;
 import org.apache.http.HttpEntity;
@@ -102,6 +103,10 @@ public class BucketController {
             AudioFile audioFile = new AudioFile(loggedInId, fileUrl);
             audioFileDao.save(audioFile);
             System.out.println("Audio file (" + fileUrl + ") added to DB!");
+
+            // Create empty transcript to monitor status
+            Transcript newTranscript = new Transcript(loggedInId, userGivenName, audioFile.getId());
+            transcriptDao.save(newTranscript);
 
             // Start asynchronous transcription of uploaded file
             amazonClientService.transcribeFile(fileUrl, userGivenName);

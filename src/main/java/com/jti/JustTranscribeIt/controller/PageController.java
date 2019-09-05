@@ -1,6 +1,7 @@
 package com.jti.JustTranscribeIt.controller;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.jti.JustTranscribeIt.Status;
 import com.jti.JustTranscribeIt.dao.*;
 import com.jti.JustTranscribeIt.model.GeneratedUrl;
 import com.jti.JustTranscribeIt.model.Transcript;
@@ -100,7 +101,10 @@ public class PageController {
         if (!urlMap.isEmpty()) {
             for(Integer i: transcriptIds) {
                 if(!urlMap.keySet().contains(i)) {
-                    toGenerate.add(i);
+                    Status status = transcriptDao.findById(i).get().getStatus();
+                    // Only generate if transcription job is finished
+                    if (status == Status.COMPLETE)
+                        toGenerate.add(i);
                 }
             }
         } else {
@@ -112,9 +116,6 @@ public class PageController {
         String authorizedUrl;
         if (!toGenerate.isEmpty()) {
 
-//            if (urlMap.isEmpty()) { // case: all files must be generated
-//                toGenerate = transcriptIds;
-//            }
 
             for(Integer i: toGenerate) {
                 // Map file url to transcript Id

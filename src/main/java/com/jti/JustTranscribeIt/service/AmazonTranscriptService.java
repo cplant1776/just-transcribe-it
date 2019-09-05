@@ -9,6 +9,7 @@ import com.amazonaws.services.transcribe.AmazonTranscribeClientBuilder;
 import com.amazonaws.services.transcribe.model.GetTranscriptionJobRequest;
 import com.amazonaws.services.transcribe.model.TranscriptionJob;
 import com.amazonaws.services.transcribe.model.TranscriptionJobStatus;
+import com.jti.JustTranscribeIt.Status;
 import com.jti.JustTranscribeIt.dao.*;
 import com.jti.JustTranscribeIt.model.Transcript;
 import com.jti.JustTranscribeIt.model.TranscriptExplicit;
@@ -67,7 +68,7 @@ public class AmazonTranscriptService {
                 .build();
     }
 
-    public void listenForJobComplete(String transcriptionJobName, Integer fileId, Integer userId, String userGivenName) {
+    public void listenForJobComplete(String transcriptionJobName, Integer fileId) {
         System.out.println("Waiting for job completion . . .");
         GetTranscriptionJobRequest jobRequest = new GetTranscriptionJobRequest();
         jobRequest.setTranscriptionJobName(transcriptionJobName);
@@ -81,7 +82,7 @@ public class AmazonTranscriptService {
 
                 try {
                     this.recordTranscription(transcriptionJob.getTranscript().getTranscriptFileUri(),
-                            fileId, userId, userGivenName);
+                            fileId);
                     System.out.println("Transcription complete!");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -104,7 +105,7 @@ public class AmazonTranscriptService {
         }
     }
 
-    private void recordTranscription(String uri, Integer fileId, Integer userId, String userGivenName) throws IOException {
+    private void recordTranscription(String uri, Integer fileId) throws IOException {
         // Get job response as String
         String res = getResponseAsString(uri);
         // Read response into JSON object
@@ -123,7 +124,7 @@ public class AmazonTranscriptService {
         Integer transcriptLength = getTranscriptLength(items);
 
         // Save basic transcript
-        saveBasicTranscript(fileId, transcript, jobName, userId, userGivenName);
+        saveBasicTranscript(fileId, transcript, jobName);
         // Get id of newly saved transcript
         Integer newTranscriptId = transcriptDao.findByJobName(jobName).getId();
 
@@ -131,7 +132,7 @@ public class AmazonTranscriptService {
         saveExplicitTranscript(newTranscriptId, transcriptExplicit);
 
         // Save user usage for transcript
-        saveUserUsage(userId, transcriptLength, newTranscriptId);
+        saveUserUsage(transcriptLength, newTranscriptId);
     }
 
     private String getResponseAsString(String uri) throws IOException {
@@ -163,9 +164,11 @@ public class AmazonTranscriptService {
         return endJSON.getInt("end_time");
     }
 
-    private void saveBasicTranscript(Integer fileId, String transcript, String jobName,
-                                     Integer userId, String userGivenName) {
-        Transcript newTranscript = new Transcript(fileId, transcript, jobName, userId, userGivenName);
+    private void saveBasicTranscript(Integer fileId, String transcript, String jobName) {
+        Transcript newTranscript = transcriptDao.findByFileId(fileId);
+        newTranscript.setTranscript(transcript);
+        newTranscript.setJobName(jobName);
+        newTranscript.setStatus(Status.COMPLETE);
         transcriptDao.save(newTranscript);
         System.out.println("Saved basic transcript | file id = " + fileId);
     }
@@ -177,7 +180,9 @@ public class AmazonTranscriptService {
 
     }
 
-    private void saveUserUsage(Integer userId, Integer transcriptLength, Integer transcriptId) {
+    private void saveUserUsage(Integer transcriptLength, Integer transcriptId) {
+        Integer userId = getLoggedInId();
+
         // Minimum length for transcript length - 15 seconds
         if (transcriptLength < 15)
             transcriptLength = 15;
