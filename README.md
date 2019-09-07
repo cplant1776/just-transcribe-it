@@ -4,7 +4,7 @@ A web app for users to upload and transcribe audio files into text. Built using 
 
 ## Link to App
 
-[Just show me the app!](http://jti-env-1.us-east-1.elasticbeanstalk.com/) Note: a couple UI elements have not yet been added, such as seeing a transcription job's status (pending, failed, etc.).
+[Just show me the app!](http://jti-env.6ji4bjd8fp.us-east-1.elasticbeanstalk.com/)
 
 ## Motivation
 
@@ -20,6 +20,7 @@ I started this project to further expand on what I have learned about web app de
 * Transcription and storage of user-uploaded audio files
 * Authenticated, expiring links to user audio files
 * Monthly usage limits
+* Text file downloads of transcripts
 
 ## Some Screenshots
 
