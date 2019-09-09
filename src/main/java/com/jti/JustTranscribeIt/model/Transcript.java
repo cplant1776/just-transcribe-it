@@ -1,6 +1,6 @@
 package com.jti.JustTranscribeIt.model;
 
-import com.jti.JustTranscribeIt.Status;
+import com.jti.JustTranscribeIt.utilities.Status;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;

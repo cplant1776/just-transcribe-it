@@ -3,18 +3,17 @@ package com.jti.JustTranscribeIt.service;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.transcribe.AmazonTranscribe;
 import com.amazonaws.services.transcribe.AmazonTranscribeClientBuilder;
 import com.amazonaws.services.transcribe.model.GetTranscriptionJobRequest;
 import com.amazonaws.services.transcribe.model.TranscriptionJob;
 import com.amazonaws.services.transcribe.model.TranscriptionJobStatus;
-import com.jti.JustTranscribeIt.Status;
 import com.jti.JustTranscribeIt.dao.*;
 import com.jti.JustTranscribeIt.model.Transcript;
 import com.jti.JustTranscribeIt.model.TranscriptExplicit;
 import com.jti.JustTranscribeIt.model.User;
 import com.jti.JustTranscribeIt.model.UserUsage;
+import com.jti.JustTranscribeIt.utilities.Status;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Service
 public class AmazonTranscriptService {

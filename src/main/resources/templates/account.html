@@ -104,7 +104,7 @@
                                         <tbody>
                                             <th:block th:each="transcript, count: ${transcripts}">
                                                 <!-- Status == COMPLETE -->
-                                                <tr th:if="${transcript.status == T(com.jti.JustTranscribeIt.Status).COMPLETE}">
+                                                <tr th:if="${transcript.status == T(com.jti.JustTranscribeIt.utilities.Status).COMPLETE}">
                                                     <!-- name -->
                                                     <td>
                                                         <a th:href="@{${urlMap.get(transcript.id)}}" th:text="${transcript.userGivenName}" target="_blank" rel="noopener noreferrer"></a>                                                            
@@ -121,7 +121,7 @@
                                                     </td>
                                                 </tr>
                                                 <!-- STATUS == PENDING -->
-                                                <tr th:if="${transcript.status == T(com.jti.JustTranscribeIt.Status).PENDING}">
+                                                <tr th:if="${transcript.status == T(com.jti.JustTranscribeIt.utilities.Status).PENDING}">
                                                     <td>
                                                         <p th:text="${transcript.userGivenName}"></p>
                                                     </td>
@@ -136,7 +136,7 @@
                                                     </td>
                                                 </tr>
                                                 <!-- STATUS = FAILED -->
-                                                <tr th:if="${transcript.status == T(com.jti.JustTranscribeIt.Status).FAILED}" colspan="4" class="text-center">
+                                                <tr th:if="${transcript.status == T(com.jti.JustTranscribeIt.utilities.Status).FAILED}" colspan="4" class="text-center">
                                                     <p>Failed . . .</p>
                                                 </tr>
                                             </th:block>
